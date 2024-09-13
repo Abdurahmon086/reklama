@@ -11,14 +11,9 @@ export default {
   theme: {
     extend: {
       container: {
-        center: true,  
-        padding: '1rem',  
+        center: true,
+        padding: '1rem',
       },
-      aspectRatio: {
-        auto: 'auto',
-        square: '1 / 1',
-        video: '16 / 9'
-      }
     },
   },
   plugins: [],
