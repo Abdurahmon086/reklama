@@ -1,36 +1,37 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
-import { z } from 'zod';
-import type { FormSubmitEvent } from '#ui/types';
+import { ref, reactive, computed } from "vue";
+import { z } from "zod";
+import type { FormSubmitEvent } from "#ui/types";
 
-// Define your options and state
 const optionsVal = [
-    { label: 'So\'m', value: 'som' },
-    { label: 'Y.E', value: 'yevro' },
+    { label: "So'm", value: "som" },
+    { label: "Y.E", value: "yevro" },
 ];
 
 const state = reactive({
-    viloyat: undefined,
-    shahar: undefined,
-    tur: undefined,
+    title: undefined,
+    content: undefined,
+    address: undefined,
+    street: undefined,
     price: undefined,
-    nextprice: undefined,
     select: undefined,
-    image: null as File | null, // Use null instead of undefined
+    type: undefined,
+    contact: undefined,
+    images: [] as File[],
 });
 
 const schema = z.object({
-    viloyat: z.any().refine((option) => option?.value === 'option-2', {
-        message: 'Select Option 2',
+    viloyat: z.any().refine((option) => option?.value === "option-2", {
+        message: "Select Option 2",
     }),
-    shahar: z.any().refine((option) => option?.value === 'option-2', {
-        message: 'Select Option 2',
+    shahar: z.any().refine((option) => option?.value === "option-2", {
+        message: "Select Option 2",
     }),
-    tur: z.any().refine((option) => option?.value === 'option-2', {
-        message: 'Select Option 2',
+    tur: z.any().refine((option) => option?.value === "option-2", {
+        message: "Select Option 2",
     }),
-    price: z.number().max(2, { message: 'Must be less than 2' }),
-    nextprice: z.number().max(2, { message: 'Must be less than 2' }),
+    price: z.number().max(2, { message: "Must be less than 2" }),
+    nextprice: z.number().max(2, { message: "Must be less than 2" }),
     select: z.string(),
 });
 
@@ -38,26 +39,35 @@ type Schema = z.infer<typeof schema>;
 
 const form = ref<HTMLFormElement>();
 
-// Image preview URL
-const imageUrl = computed(() => {
-    if (state.image) {
-        return URL.createObjectURL(state.image);
-    }
-    return '';
+const imageUrls = ref<string[]>([]);
+
+const computedImageUrls = computed(() => {
+    return state.images.map((image) => URL.createObjectURL(image));
 });
 
 function handleFileChange(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-        state.image = input.files[0];
+    if (input.files) {
+        state.images = Array.from(input.files);
+        imageUrls.value = computedImageUrls.value;
     }
+}
+
+function clearForm() {
+    imageUrls.value.forEach((url) => URL.revokeObjectURL(url));
+    imageUrls.value = [];
+    state.images = [];
+    form.value?.clear();
 }
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     console.log(event.data);
 }
-</script>
 
+onBeforeUnmount(() => {
+    imageUrls.value.forEach((url) => URL.revokeObjectURL(url));
+});
+</script>
 
 <template>
     <div class="container">
@@ -94,20 +104,17 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     </UFormGroup>
                 </div>
                 <UFormGroup name="images" label="Images" size="xl">
-                    <UInput
-                        v-model="state.image"
-                        type="file"
-                        size="xl"
-                        icon="i-heroicons-folder"
-                        @change="handleFileChange"
-                    />
-                    <div v-if="imageUrl" class="mt-4">
-                        <img :src="imageUrl" alt="Image preview" class="max-w-full h-auto" />
+                    <input type="file" @change="handleFileChange" multiple accept="image/*" class="mt-2" />
+                    <div class="mt-4">
+                        <div v-for="(url, index) in imageUrls" :key="index" class="inline-block mr-4">
+                            <img :src="url" alt="Image preview" class="max-w-[350px] aspect-[1.7] object-cover" />
+                        </div>
                     </div>
                 </UFormGroup>
+
                 <UButton type="submit"> Submit </UButton>
 
-                <UButton variant="outline" class="ml-2" @click="form.clear()"> Clear </UButton>
+                <UButton variant="outline" class="ml-2" @click="form?.clear()"> Clear </UButton>
             </UForm>
         </div>
     </div>
