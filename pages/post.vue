@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
-import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 
 const optionsVal = [
@@ -9,33 +8,16 @@ const optionsVal = [
 ];
 
 const state = reactive({
-    title: undefined,
-    content: undefined,
-    address: undefined,
-    street: undefined,
-    price: undefined,
+    title: "",
+    content: "",
+    address: "",
+    street: "",
+    price: "",
     select: undefined,
-    type: undefined,
-    contact: undefined,
+    type: "",
+    contact: "",
     images: [] as File[],
 });
-
-const schema = z.object({
-    viloyat: z.any().refine((option) => option?.value === "option-2", {
-        message: "Select Option 2",
-    }),
-    shahar: z.any().refine((option) => option?.value === "option-2", {
-        message: "Select Option 2",
-    }),
-    tur: z.any().refine((option) => option?.value === "option-2", {
-        message: "Select Option 2",
-    }),
-    price: z.number().max(2, { message: "Must be less than 2" }),
-    nextprice: z.number().max(2, { message: "Must be less than 2" }),
-    select: z.string(),
-});
-
-type Schema = z.infer<typeof schema>;
 
 const form = ref<HTMLFormElement>();
 
@@ -57,12 +39,28 @@ function clearForm() {
     imageUrls.value.forEach((url) => URL.revokeObjectURL(url));
     imageUrls.value = [];
     state.images = [];
-    form.value?.clear();
+    state.title = "";
+    state.content = "";
+    state.address = "";
+    state.street = "";
+    state.price = "";
+    state.select = undefined;
+    state.type = "";
+    state.contact = "";
 }
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
+async function onSubmit(event: FormSubmitEvent<any>) {
     console.log(event.data);
 }
+
+const numericPrice = computed({
+    get() {
+        return state.price;
+    },
+    set(value) {
+        state.price = value.replace(/\D/g, "");
+    },
+});
 
 onBeforeUnmount(() => {
     imageUrls.value.forEach((url) => URL.revokeObjectURL(url));
@@ -72,7 +70,7 @@ onBeforeUnmount(() => {
 <template>
     <div class="container">
         <div class="bg-slate-500 dark:bg-gray-800 my-36 py-10 px-5 h-full">
-            <UForm ref="form" :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+            <UForm ref="form" :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormGroup name="title" label="Title" size="xl">
                     <UInput v-model="state.title" />
                 </UFormGroup>
@@ -89,7 +87,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="flex justify-between gap-6">
                     <UFormGroup name="price" label="Price" size="xl" class="w-full">
-                        <UInput v-model="state.price" type="number" />
+                        <UInput v-model="numericPrice" type="text" />
                     </UFormGroup>
                     <UFormGroup name="select" label="Valyuta" size="xl" class="w-full">
                         <USelect v-model="state.select" :options="optionsVal" />
@@ -114,7 +112,7 @@ onBeforeUnmount(() => {
 
                 <UButton type="submit"> Submit </UButton>
 
-                <UButton variant="outline" class="ml-2" @click="form?.clear()"> Clear </UButton>
+                <UButton variant="outline" class="ml-2" @click="clearForm"> Clear </UButton>
             </UForm>
         </div>
     </div>
