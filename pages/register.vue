@@ -5,7 +5,6 @@ definePageMeta({
 
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
-import { corePlugins } from "#tailwind-config";
 
 const schema = z.object({
     email: z.string().email("Invalid email"),
@@ -21,17 +20,26 @@ const state = reactive({
 
 const router = useRouter();
 const toast = useToast();
+const loading = ref(false);
 
 const register = async (email: string, password: string) => {
-    const todo = await useFetch("http://127.0.0.1:8000/api/v1/user/create", {
-        method: "POST",
-        body: {
-            username: email,
-            password,
-        },
-    });
-
-    console.log(todo);
+    try {
+        loading.value = true;
+        const { status } = await useFetch("http://127.0.0.1:8000/api/v1/user/create", {
+            method: "POST",
+            body: {
+                username: email,
+                password,
+            },
+        });
+        if (status.value == "success") {
+            router.push("/");
+        } else {
+            toast.add({ title: "Login failed. Please check your credentials." });
+        }
+    } finally {
+        loading.value = false;
+    }
 };
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
@@ -60,7 +68,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     <UInput v-model="state.password" type="password" />
                 </UFormGroup>
 
-                <UButton type="submit" size="lg" block> Register </UButton>
+                <UButton :disabled="loading" type="submit" size="lg" block class="relative">
+                    <span v-if="!loading">Register</span>
+                    <span v-else>
+                        <Loading />
+                    </span>
+                </UButton>
                 <p class="text-center mt-2 text-sm">
                     Hisobingiz yo'qmi? <NuxtLink to="/login" class="text-blue-500"> Login</NuxtLink>
                 </p>

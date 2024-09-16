@@ -23,15 +23,9 @@ const state = reactive({
 });
 
 const schema = z.object({
-    viloyat: z.any().refine((option) => option?.value === "option-2", {
-        message: "Select Option 2",
-    }),
-    shahar: z.any().refine((option) => option?.value === "option-2", {
-        message: "Select Option 2",
-    }),
-    tur: z.any().refine((option) => option?.value === "option-2", {
-        message: "Select Option 2",
-    }),
+    viloyat: z.any(),
+    shahar: z.any(),
+    tur: z.any(),
     price: z.number().max(2, { message: "Must be less than 2" }),
     nextprice: z.number().max(2, { message: "Must be less than 2" }),
     select: z.string(),
@@ -45,6 +39,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     console.log(event.data);
 }
 </script>
+
 <template>
     <div class="w-full h-screen bg-blue-400 dark:bg-gray-900 pt-24">
         <main class="container">
@@ -71,228 +66,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                         </UFormGroup>
 
                         <UButton type="submit"> Submit </UButton>
-
                         <UButton variant="outline" class="ml-2" @click="form.clear()"> Clear </UButton>
                     </UForm>
                 </div>
-                <div class="col-span-3 dark:bg-gray-600 w-full py-3 px-4 overflow-y-auto scroll-container">
+                <div class="col-span-3 dark:bg-gray-600 w-full py-3 px-4 overflow-y-auto scroll-container bg-slate-200">
                     <div class="grid grid-cols-3 gap-4">
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
-                        <div class="rounded-md overflow-hidden">
-                            <div class="w-hull aspect-[1.7] relative">
-                                <img
-                                    src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                                    alt=""
-                                    class="h-full"
-                                />
-                            </div>
-                            <div class="py-2 px-3 bg-slate-500 dark:bg-gray-800">
-                                <h4 class="text-xl font-bold mb-2">Home</h4>
-                                <p class="line-clamp-3 mb-2">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quis cum quam, cupiditate
-                                    nulla recusandae modi in aperiam nobis excepturi non quidem minus nisi fugiat
-                                    pariatur, explicabo soluta consequuntur quaerat eaque.
-                                </p>
-                                <p class="font-bold">50$</p>
-                            </div>
-                        </div>
+                        <CardsMainCard v-for="n in 10" :key="n" />
                     </div>
                 </div>
             </div>
@@ -309,5 +88,4 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     background-color: #9ca3af;
     border-radius: 6px;
 }
-
 </style>

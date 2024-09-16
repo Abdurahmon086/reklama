@@ -21,17 +21,19 @@ const state = reactive({
 const router = useRouter();
 const toast = useToast();
 const loading = ref(false);
-
+interface LoginResponse {
+    access: string;
+}
 const login = async (email: string, password: string) => {
     try {
         loading.value = true;
-        const { status } = await useFetch("http://127.0.0.1:8000/api/v1/get_token/", {
+        const { data, status } = await useFetch<LoginResponse>("http://127.0.0.1:8000/api/v1/get_token/", {
             method: "POST",
             body: { username: email, password },
         });
-        console.log(status);
 
         if (status.value == "success") {
+            localStorage.setItem("token", JSON.stringify(data?.value?.access));
             router.push("/");
         } else {
             toast.add({ title: "Login failed. Please check your credentials." });
