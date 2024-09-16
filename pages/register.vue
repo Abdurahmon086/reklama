@@ -5,6 +5,7 @@ definePageMeta({
 
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
+import { corePlugins } from "#tailwind-config";
 
 const schema = z.object({
     email: z.string().email("Invalid email"),
@@ -21,13 +22,24 @@ const state = reactive({
 const router = useRouter();
 const toast = useToast();
 
+const register = async (email: string, password: string) => {
+    const todo = await useFetch("http://127.0.0.1:8000/api/v1/user/create", {
+        method: "POST",
+        body: {
+            username: email,
+            password,
+        },
+    });
+
+    console.log(todo);
+};
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     event.preventDefault();
     const { email, password } = event.data;
-    console.log(email, password);
 
     if (email && password) {
-        console.log(email, password);
+        register(email, password);
         router.push("/");
     } else {
         toast.add({ title: "Please fill out both fields" });

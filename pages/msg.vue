@@ -1,4 +1,7 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const { data } = await useFetch("http://127.0.0.1:8000/api/v1/message");
+console.log(data);
+</script>
 <template>
     <div class="container pt-24 h-screen">
         <div class="py-3 px-4 text-black h-full flex flex-col justify-between">
@@ -58,7 +61,7 @@
             </ul>
             <div class="align-bottom flex w-full gap-4 pb-6">
                 <UFormGroup name="email" class="flex-1">
-                    <UInput class="!w-full " size="xl"  placeholder="Xabar yuborish...." />
+                    <UInput class="!w-full" size="xl" placeholder="Xabar yuborish...." />
                 </UFormGroup>
                 <UButton type="submit"> Submit </UButton>
             </div>
@@ -66,6 +69,4 @@
     </div>
 </template>
 
-<style lang="css" scoped>
-
-</style>
+<style lang="css" scoped></style>

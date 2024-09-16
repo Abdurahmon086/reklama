@@ -62,6 +62,8 @@ const numericPrice = computed({
     },
 });
 
+
+
 onBeforeUnmount(() => {
     imageUrls.value.forEach((url) => URL.revokeObjectURL(url));
 });
