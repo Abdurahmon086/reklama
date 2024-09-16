@@ -38,6 +38,20 @@ const form = ref();
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     console.log(event.data);
 }
+
+import { getItem } from "~/utility/localStorageControl";
+
+const token = getItem("token");
+
+const { data } = await useFetch("http://127.0.0.1:8000/api/v1/message/", {
+    headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+    },
+});
+
+console.log(data);
+
 </script>
 
 <template>
