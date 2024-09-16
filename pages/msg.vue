@@ -2,18 +2,12 @@
 import { getItem } from "~/utility/localStorageControl";
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
-
-interface IMessage {
-    id: number;
-    user: number;
-    message: string;
-    created_at: string;
-}
+import type { IMessage } from "~/types";
 
 const token = getItem("token");
 
 const schema = z.object({
-    message: z.string().min(2, "Must be at least 2 characters"),
+    message: z.string().min(2, "2ta harfdan ko'proq yozing"),
 });
 
 type Schema = z.output<typeof schema>;
@@ -101,16 +95,14 @@ const updateMessage = async (id: number, updatedMessage: string) => {
             <ul class="space-y-4 flex-1 overflow-y-auto scroll-container">
                 <li class="bg-yellow-400 py-3 px-4 rounded-lg relative group" v-for="item in data" :key="item?.id">
                     <div class="flex gap-3">
-                        <h4>User {{ item?.user }}</h4>
-                        <p>id: {{ item?.id }}</p>
+                        <h4 class="font-bold">User {{ item?.user }}</h4>
+                        <h4 class="font-bold">id: {{ item?.id }}</h4>
                     </div>
                     <div>
                         <p>{{ item?.message }}</p>
                     </div>
                     <div class="group-hover:flex hidden transition-all gap-2 absolute top-2 right-4">
-                        <span
-                            class="block px-2 py-1 rounded-md bg-blue-500 text-white w-fit cursor-pointer"
-                            @click="updateMessage(item?.id)"
+                        <span class="block px-2 py-1 rounded-md bg-blue-500 text-white w-fit cursor-pointer"
                             >Update</span
                         >
                         <span
