@@ -25,7 +25,7 @@ const loading = ref(false);
 const register = async (email: string, password: string) => {
     try {
         loading.value = true;
-        const { status } = await useFetch("http://127.0.0.1:8000/api/v1/user/create", {
+        const { status } = await useFetch("http://127.0.0.1:8000/api/v1/user/create/", {
             method: "POST",
             body: {
                 username: email,
@@ -33,7 +33,7 @@ const register = async (email: string, password: string) => {
             },
         });
         if (status.value == "success") {
-            router.push("/");
+            router.push("/login");
         } else {
             toast.add({ title: "Login failed. Please check your credentials." });
         }
@@ -48,7 +48,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     if (email && password) {
         register(email, password);
-        router.push("/");
+        router.push("/login");
     } else {
         toast.add({ title: "Please fill out both fields" });
     }
