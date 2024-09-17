@@ -3,21 +3,22 @@ import { getItem } from "~/utility/localStorageControl";
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 import type { IMessage } from "~/types";
+import { BASE_URL } from "~/constants";
 
 const token = getItem("token");
 
 const isOpen = ref(false);
-const getId = ref<number | null>(null); // Ensure it's initialized properly
+const getId = ref<number | null>(null);
 
 const state = reactive({
     message: "",
-    messageUp: "", // For the update message
+    messageUp: "",
 });
 
 const isModal = (val: boolean, id: number, message: string) => {
     isOpen.value = val;
-    getId.value = id; // Set the ID of the message to be updated
-    state.messageUp = message; // Pre-fill the input with the current message
+    getId.value = id;
+    state.messageUp = message;
 };
 
 const schema = z.object({
@@ -27,7 +28,7 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const { data, refresh } = await useFetch<IMessage[]>("http://127.0.0.1:8000/api/v1/message/", {
+const { data, refresh } = await useFetch<IMessage[]>(`${BASE_URL}message/`, {
     headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -57,7 +58,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
 const createPost = async (message: string) => {
     try {
-        await $fetch("http://127.0.0.1:8000/api/v1/message_create/", {
+        await $fetch(`${BASE_URL}message_create/`, {
             method: "POST",
             body: JSON.stringify({ message }),
             headers: {
@@ -72,7 +73,7 @@ const createPost = async (message: string) => {
 
 const deleteMessage = async (id: number) => {
     try {
-        await $fetch(`http://127.0.0.1:8000/api/v1/message/${id}/`, {
+        await $fetch(`${BASE_URL}message/${id}/`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -89,10 +90,8 @@ const updateMessage = async (event: FormSubmitEvent<Schema>) => {
     event.preventDefault();
     if (!getId.value) return;
 
-    console.log(state.messageUp);
-
     try {
-        await $fetch(`http://127.0.0.1:8000/api/v1/message_update/${getId.value}/`, {
+        await $fetch(`${BASE_URL}message_update/${getId.value}/`, {
             method: "PUT",
             body: JSON.stringify({ message: state.messageUp }),
             headers: {
@@ -144,7 +143,6 @@ const updateMessage = async (event: FormSubmitEvent<Schema>) => {
         </div>
     </div>
 
-   
     <UModal v-model="isOpen" class="z-[999999999]">
         <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
             <template #header>
