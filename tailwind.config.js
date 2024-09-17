@@ -6,7 +6,6 @@ export default {
     './pages/**/*.vue',
     './plugins/**/*.{js,ts}',
     './nuxt.config.{js,ts}',
-    'docs/content/**/*.md'
   ],
   theme: {
     extend: {

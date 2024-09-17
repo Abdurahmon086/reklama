@@ -1,8 +1,7 @@
 <template>
-    <div>
-        <NuxtLayout>
-            <NuxtPage />
-        </NuxtLayout>
-        <!-- <UNotifications /> -->
-    </div>
+    <NuxtLoadingIndicator />
+    <NuxtLayout>
+        <NuxtPage />
+    </NuxtLayout>
+    <!-- <UNotifications class="z-0" /> -->
 </template>

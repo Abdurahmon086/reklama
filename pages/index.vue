@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
+import { getItem } from "~/utility/localStorageControl";
+import { BASE_URL } from "~/constants";
 
 const options = [
     { label: "Option 1", value: "option-1" },
@@ -39,19 +41,36 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     console.log(event.data);
 }
 
-import { getItem } from "~/utility/localStorageControl";
-
 const token = getItem("token");
+console.log(`${BASE_URL}random_adver/`);
 
-const { data } = await useFetch("http://127.0.0.1:8000/api/v1/message/", {
+const { data } = await useFetch(`${BASE_URL}random_adver/`, {
     headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
     },
 });
 
-console.log(data);
+// const { data: discounts, status } = await useAsyncData("cart-discount", async () => {
+//     const [coupons, offers] = await Promise.all([
+//         $fetch(`${BASE_URL}get_region/`, {
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 Authorization: `Bearer ${token}`,
+//             },
+//         }),
+//         $fetch(`${BASE_URL}adver_type/`, {
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 Authorization: `Bearer ${token}`,
+//             },
+//         }),
+//     ]);
 
+//     return { coupons, offers };
+// });
+
+console.log(data);
 </script>
 
 <template>

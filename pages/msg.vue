@@ -6,17 +6,28 @@ import type { IMessage } from "~/types";
 
 const token = getItem("token");
 
+const isOpen = ref(false);
+const getId = ref<number | null>(null); // Ensure it's initialized properly
+
+const state = reactive({
+    message: "",
+    messageUp: "", // For the update message
+});
+
+const isModal = (val: boolean, id: number, message: string) => {
+    isOpen.value = val;
+    getId.value = id; // Set the ID of the message to be updated
+    state.messageUp = message; // Pre-fill the input with the current message
+};
+
 const schema = z.object({
     message: z.string().min(2, "2ta harfdan ko'proq yozing"),
+    messageUp: z.string().min(2, "2ta harfdan ko'proq yozing"),
 });
 
 type Schema = z.output<typeof schema>;
 
-const state = reactive({
-    message: "",
-});
-
-const { data, refresh } = await useLazyFetch<IMessage[]>("http://127.0.0.1:8000/api/v1/message/", {
+const { data, refresh } = await useFetch<IMessage[]>("http://127.0.0.1:8000/api/v1/message/", {
     headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -34,9 +45,11 @@ const fetchMessages = async () => {
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     event.preventDefault();
     try {
-        await createPost(event.data.message);
-        state.message = "";
-        await fetchMessages();
+        if (event.data.message.length > 2) {
+            await createPost(event.data.message);
+            state.message = "";
+            await fetchMessages();
+        }
     } catch (error) {
         console.error("Error creating post:", error);
     }
@@ -44,7 +57,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
 const createPost = async (message: string) => {
     try {
-        await useLazyFetch("http://127.0.0.1:8000/api/v1/message_create/", {
+        await $fetch("http://127.0.0.1:8000/api/v1/message_create/", {
             method: "POST",
             body: JSON.stringify({ message }),
             headers: {
@@ -59,7 +72,7 @@ const createPost = async (message: string) => {
 
 const deleteMessage = async (id: number) => {
     try {
-        await useLazyFetch(`http://127.0.0.1:8000/api/v1/message/${id}/`, {
+        await $fetch(`http://127.0.0.1:8000/api/v1/message/${id}/`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -72,17 +85,23 @@ const deleteMessage = async (id: number) => {
     }
 };
 
-const updateMessage = async (id: number, updatedMessage: string) => {
+const updateMessage = async (event: FormSubmitEvent<Schema>) => {
+    event.preventDefault();
+    if (!getId.value) return;
+
+    console.log(state.messageUp);
+
     try {
-        await useLazyFetch(`http://127.0.0.1:8000/api/v1/message_update/${id}/`, {
+        await $fetch(`http://127.0.0.1:8000/api/v1/message_update/${getId.value}/`, {
             method: "PUT",
-            body: JSON.stringify({ message: updatedMessage }),
+            body: JSON.stringify({ message: state.messageUp }),
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
         });
         await fetchMessages();
+        isOpen.value = false;
     } catch (error) {
         console.error("Error updating message:", error);
     }
@@ -102,7 +121,9 @@ const updateMessage = async (id: number, updatedMessage: string) => {
                         <p>{{ item?.message }}</p>
                     </div>
                     <div class="group-hover:flex hidden transition-all gap-2 absolute top-2 right-4">
-                        <span class="block px-2 py-1 rounded-md bg-blue-500 text-white w-fit cursor-pointer"
+                        <span
+                            class="block px-2 py-1 rounded-md bg-blue-500 text-white w-fit cursor-pointer"
+                            @click="isModal(true, item?.id, item?.message)"
                             >Update</span
                         >
                         <span
@@ -113,6 +134,7 @@ const updateMessage = async (id: number, updatedMessage: string) => {
                     </div>
                 </li>
             </ul>
+
             <UForm :state="state" class="align-bottom flex w-full gap-4 pb-6" @submit="onSubmit">
                 <UFormGroup name="message" class="flex-1">
                     <UInput v-model="state.message" class="!w-full" size="xl" placeholder="Xabar yuborish...." />
@@ -121,6 +143,29 @@ const updateMessage = async (id: number, updatedMessage: string) => {
             </UForm>
         </div>
     </div>
-</template>
 
-<style lang="css" scoped></style>
+   
+    <UModal v-model="isOpen" class="z-[999999999]">
+        <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+            <template #header>
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">Modal</h3>
+                    <UButton
+                        color="gray"
+                        variant="ghost"
+                        icon="i-heroicons-x-mark-20-solid"
+                        class="-my-1"
+                        @click="isOpen = false"
+                    />
+                </div>
+            </template>
+
+            <UForm :state="state" class="align-bottom flex w-full gap-4 pb-6" @submit="updateMessage">
+                <UFormGroup name="messageUp" class="flex-1">
+                    <UInput v-model="state.messageUp" class="!w-full" size="xl" placeholder="Xabarni tahrirlash...." />
+                </UFormGroup>
+                <UButton type="submit">Update</UButton>
+            </UForm>
+        </UCard>
+    </UModal>
+</template>
