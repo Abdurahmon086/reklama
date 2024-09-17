@@ -1,19 +1,11 @@
 <script setup lang="ts">
 import { z } from "zod";
-import type { FormSubmitEvent } from "#ui/types";
 import { getItem } from "~/utility/localStorageControl";
 import { BASE_URL } from "~/constants";
+import type { IRegion } from "~/types";
+import type { FormSubmitEvent } from "#ui/types";
 
-const options = [
-    { label: "Option 1", value: "option-1" },
-    { label: "Option 2", value: "option-2" },
-    { label: "Option 3", value: "option-3" },
-];
-
-const optionsVal = [
-    { label: "So'm", value: "som" },
-    { label: "Y.E", value: "yevro" },
-];
+const token = getItem("token");
 
 const state = reactive({
     viloyat: "",
@@ -25,52 +17,81 @@ const state = reactive({
 });
 
 const schema = z.object({
-    viloyat: z.any(),
-    shahar: z.any(),
-    tur: z.any(),
-    price: z.number().max(2, { message: "Must be less than 2" }),
-    nextprice: z.number().max(2, { message: "Must be less than 2" }),
+    price: z.number(),
+    nextprice: z.number(),
     select: z.string(),
 });
 
 type Schema = z.infer<typeof schema>;
 
-const form = ref();
+const formclear = () => {
+    state.viloyat = "";
+    state.shahar = "";
+    state.tur = "";
+    state.price = "";
+    state.nextprice = "";
+    state.select = "";
+};
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    console.log(event.data);
+    try {
+        console.log(event.data);
+    } catch (error) {
+        console.error("Form submission error:", error);
+    }
 }
 
-const token = getItem("token");
-console.log(`${BASE_URL}random_adver/`);
+const { data: discounts } = await useAsyncData("cart-discount", async () => {
+    try {
+        const [region, type] = await Promise.all([
+            $fetch<IRegion[]>(`${BASE_URL}get_region/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }),
+            $fetch<IRegion[]>(`${BASE_URL}adver_type/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }),
+        ]);
+        const re = region.map(({ id, name }) => ({ label: name, value: id })) ?? [];
+        const ty = type.map(({ id, name }) => ({ label: name, value: id })) ?? [];
 
-const { data } = await useFetch(`${BASE_URL}random_adver/`, {
-    headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-    },
+        return { re, ty };
+    } catch (err) {
+        console.error("Error fetching data:", err);
+        return { region: [], type: [] };
+    }
 });
 
-// const { data: discounts, status } = await useAsyncData("cart-discount", async () => {
-//     const [coupons, offers] = await Promise.all([
-//         $fetch(`${BASE_URL}get_region/`, {
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 Authorization: `Bearer ${token}`,
-//             },
-//         }),
-//         $fetch(`${BASE_URL}adver_type/`, {
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 Authorization: `Bearer ${token}`,
-//             },
-//         }),
-//     ]);
+const optionsVal = [
+    { label: "So'm", value: "som" },
+    { label: "Y.E", value: "yevro" },
+];
 
-//     return { coupons, offers };
-// });
+const cityOptions = ref<{ label: string; value: number }[]>([]);
 
-console.log(data);
+watch(
+    () => state.viloyat,
+    async (newVal: any) => {
+        if (newVal) {
+            try {
+                const cities = await $fetch<IRegion[]>(`${BASE_URL}get_street/${newVal.value}/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                cityOptions.value = cities.map(({ name, id }) => ({
+                    label: name,
+                    value: id,
+                }));
+            } catch (error) {
+                console.error("Error fetching cities:", error);
+            }
+        }
+    }
+);
 </script>
 
 <template>
@@ -78,15 +99,15 @@ console.log(data);
         <main class="container">
             <div class="grid grid-cols-4 rounded h-[800px]">
                 <div class="col-span-1 bg-slate-500 dark:bg-gray-800 py-3 px-4 h-full">
-                    <UForm ref="form" :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+                    <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                         <UFormGroup name="viloyat" label="Viloyat:">
-                            <UInputMenu v-model="state.viloyat" :options="options" />
+                            <UInputMenu v-model="state.viloyat" :options="discounts?.re" />
                         </UFormGroup>
                         <UFormGroup name="shahar" label="Shahar:">
-                            <UInputMenu v-model="state.shahar" :options="options" />
+                            <UInputMenu v-model="state.shahar" :options="cityOptions" />
                         </UFormGroup>
                         <UFormGroup name="tur" label="Tur:">
-                            <UInputMenu v-model="state.tur" :options="options" />
+                            <UInputMenu v-model="state.tur" :options="discounts?.ty" />
                         </UFormGroup>
                         <UFormGroup name="price" label="Boshlang'ich narx:">
                             <UInput v-model="state.price" type="number" />
@@ -98,8 +119,8 @@ console.log(data);
                             <USelect v-model="state.select" :options="optionsVal" />
                         </UFormGroup>
 
-                        <UButton type="submit"> Submit </UButton>
-                        <UButton variant="outline" class="ml-2" @click="form.clear()"> Clear </UButton>
+                        <UButton type="submit">Submit</UButton>
+                        <UButton variant="outline" class="ml-2" @click="formclear">Clear</UButton>
                     </UForm>
                 </div>
                 <div class="col-span-3 dark:bg-gray-600 w-full py-3 px-4 overflow-y-auto scroll-container bg-slate-200">

@@ -4,3 +4,9 @@ export interface IMessage {
     message: string;
     created_at: string;
 }
+
+export interface IRegion {
+    value: any;
+    id: number;
+    name: string;
+}
