@@ -43,29 +43,22 @@ const fetchMessages = async () => {
     }
 };
 
-const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+const createPost = async (event: FormSubmitEvent<Schema>) => {
     event.preventDefault();
     try {
         if (event.data.message.length > 2) {
-            await createPost(event.data.message);
+            const message = event.data.message;
+            await $fetch(`${BASE_URL}message_create/`, {
+                method: "POST",
+                body: JSON.stringify({ message }),
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             state.message = "";
             await fetchMessages();
         }
-    } catch (error) {
-        console.error("Error creating post:", error);
-    }
-};
-
-const createPost = async (message: string) => {
-    try {
-        await $fetch(`${BASE_URL}message_create/`, {
-            method: "POST",
-            body: JSON.stringify({ message }),
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
     } catch (error) {
         console.error("Error creating post:", error);
     }
@@ -134,7 +127,7 @@ const updateMessage = async (event: FormSubmitEvent<Schema>) => {
                 </li>
             </ul>
 
-            <UForm :state="state" class="align-bottom flex w-full gap-4 pb-6" @submit="onSubmit">
+            <UForm :state="state" class="align-bottom flex w-full gap-4 pb-6" @submit="createPost">
                 <UFormGroup name="message" class="flex-1">
                     <UInput v-model="state.message" class="!w-full" size="xl" placeholder="Xabar yuborish...." />
                 </UFormGroup>
