@@ -5,6 +5,17 @@ definePageMeta({
 
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
+import { BASE_URL } from "~/constants";
+
+const router = useRouter();
+const toast = useToast();
+
+const loading = ref(false);
+
+const state = reactive({
+    email: undefined,
+    password: undefined,
+});
 
 const schema = z.object({
     email: z.string().email("Invalid email"),
@@ -13,19 +24,10 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const state = reactive({
-    email: undefined,
-    password: undefined,
-});
-
-const router = useRouter();
-const toast = useToast();
-const loading = ref(false);
-
 const register = async (email: string, password: string) => {
     try {
         loading.value = true;
-        const { status } = await useFetch("http://127.0.0.1:8000/api/v1/user/create/", {
+        const { status } = await useFetch(`${BASE_URL}user/create/`, {
             method: "POST",
             body: {
                 username: email,

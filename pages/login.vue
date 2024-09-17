@@ -3,8 +3,24 @@ definePageMeta({
     layout: "login",
 });
 
+interface LoginResponse {
+    access: string;
+}
+
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
+import { BASE_URL } from "~/constants";
+
+
+const router = useRouter();
+const toast = useToast();
+
+const loading = ref(false);
+
+const state = reactive({
+    email: "",
+    password: "",
+});
 
 const schema = z.object({
     email: z.string(),
@@ -13,21 +29,12 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const state = reactive({
-    email: "",
-    password: "",
-});
 
-const router = useRouter();
-const toast = useToast();
-const loading = ref(false);
-interface LoginResponse {
-    access: string;
-}
+
 const login = async (email: string, password: string) => {
     try {
         loading.value = true;
-        const { data, status } = await useFetch<LoginResponse>("http://127.0.0.1:8000/api/v1/get_token/", {
+        const { data, status } = await useFetch<LoginResponse>(`${BASE_URL}get_token/`, {
             method: "POST",
             body: { username: email, password },
         });
