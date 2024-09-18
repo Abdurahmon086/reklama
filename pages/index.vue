@@ -10,42 +10,32 @@ const token = getItem("token");
 const data = ref<IPost[] | null>([]);
 
 const state = reactive({
-    viloyat: "",
-    shahar: "",
-    tur: "",
+    address: "",
+    street: "",
+    type: "",
     price: "",
     nextprice: "",
-    select: "",
+    price_type: "",
 });
-
-const schema = z.object({
-    price: z.number(),
-    nextprice: z.number(),
-    select: z.string(),
-});
-
-type Schema = z.infer<typeof schema>;
 
 const formclear = () => {
-    state.viloyat = "";
-    state.shahar = "";
-    state.tur = "";
+    state.address = "";
+    state.street = "";
+    state.type = "";
     state.price = "";
     state.nextprice = "";
-    state.select = "";
+    state.price_type = "";
 };
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
+async function onSubmit(event: FormSubmitEvent<any>) {
     event.preventDefault();
-    try {
-        const { data: filter } = useFetch<IPost[]>(`${BASE_URL}filter/`, {
-            body: JSON.stringify(event.data),
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+    const queryParams = new URLSearchParams(event.data as any).toString();
 
-        data.value = filter.value;
+    try {
+        const filter = await $fetch<IPost[]>(`${BASE_URL}filter/?${queryParams}`).then((res) => res);
+
+        data.value = filter;
+        console.log(filter);
     } catch (error) {
         console.error("Form submission error:", error);
     }
@@ -58,7 +48,7 @@ const { data: randomD1 } = useFetch<IPost[]>(`${BASE_URL}adver/`, {
     },
 });
 
-console.log(randomD1);
+console.log(randomD1, data);
 
 const { data: discounts } = await useAsyncData("cart-discount", async () => {
     try {
@@ -85,14 +75,14 @@ const { data: discounts } = await useAsyncData("cart-discount", async () => {
 });
 
 const optionsVal = [
-    { label: "So'm", value: "som" },
+    { label: "So'm", value: "Sum" },
     { label: "Y.E", value: "yevro" },
 ];
 
 const cityOptions = ref<{ label: string; value: number }[]>([]);
 
 watch(
-    () => state.viloyat,
+    () => state.address,
     async (newVal: any) => {
         if (newVal) {
             try {
@@ -118,15 +108,15 @@ watch(
         <main class="container">
             <div class="grid grid-cols-4 rounded h-[800px]">
                 <div class="col-span-1 bg-slate-500 dark:bg-gray-800 py-3 px-4 h-full">
-                    <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                        <UFormGroup name="viloyat" label="Viloyat:">
-                            <UInputMenu v-model="state.viloyat" :options="discounts?.re" />
+                    <UForm :state="state" class="space-y-4" @submit="onSubmit">
+                        <UFormGroup name="address" label="Viloyat:">
+                            <UInputMenu v-model="state.address" :options="discounts?.re" />
                         </UFormGroup>
-                        <UFormGroup name="shahar" label="Shahar:">
-                            <UInputMenu v-model="state.shahar" :options="cityOptions" />
+                        <UFormGroup name="street" label="Shahar:">
+                            <UInputMenu v-model="state.street" :options="cityOptions" />
                         </UFormGroup>
-                        <UFormGroup name="tur" label="Tur:">
-                            <UInputMenu v-model="state.tur" :options="discounts?.ty" />
+                        <UFormGroup name="type" label="Tur:">
+                            <UInputMenu v-model="state.type" :options="discounts?.ty" />
                         </UFormGroup>
                         <UFormGroup name="price" label="Boshlang'ich narx:">
                             <UInput v-model="state.price" type="number" />
@@ -134,8 +124,8 @@ watch(
                         <UFormGroup name="nextprice" label="Tugaydigan narx:">
                             <UInput v-model="state.nextprice" type="number" />
                         </UFormGroup>
-                        <UFormGroup name="select" label="Valyuta:">
-                            <USelect v-model="state.select" :options="optionsVal" />
+                        <UFormGroup name="price_type" label="Valyuta:">
+                            <USelect v-model="state.price_type" :options="optionsVal" />
                         </UFormGroup>
 
                         <UButton type="submit">Submit</UButton>
@@ -144,7 +134,11 @@ watch(
                 </div>
                 <div class="col-span-3 dark:bg-gray-600 w-full py-3 px-4 overflow-y-auto scroll-container bg-slate-200">
                     <div class="grid grid-cols-3 gap-4">
-                        <CardsMainCard v-for="item in randomD1" :key="item.created_at" :data="item" />
+                        <CardsMainCard
+                            v-for="item in data?.length > 0 ? data : randomD1"
+                            :key="item.created_at"
+                            :data="item"
+                        />
                     </div>
                 </div>
             </div>

@@ -12,7 +12,7 @@ const state = reactive({
     address: "",
     street: "",
     price: "",
-    select: "",
+    price_type: "",
     type: "",
     contact: "",
     images: [] as File[],
@@ -39,7 +39,7 @@ function clearForm() {
     state.address = "";
     state.street = "";
     state.price = "";
-    state.select = "";
+    state.price_type = "";
     state.type = "";
     state.contact = "";
 }
@@ -56,7 +56,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
                 Authorization: `Bearer ${token}`,
             },
         });
-        console.log(data, status, 'sad');
+        console.log(data, status, "sad");
     } catch (err) {
         console.error("Post send", err);
     }
@@ -103,8 +103,8 @@ onBeforeUnmount(() => {
                     <UFormGroup name="price" label="Price" size="xl" class="w-full">
                         <UInput v-model="numericPrice" type="text" />
                     </UFormGroup>
-                    <UFormGroup name="select" label="Valyuta" size="xl" class="w-full">
-                        <USelect v-model="state.select" :options="optionsVal" />
+                    <UFormGroup name="price_type" label="Valyuta" size="xl" class="w-full">
+                        <USelect v-model="state.price_type" :options="optionsVal" />
                     </UFormGroup>
                 </div>
                 <div class="flex justify-between gap-6">
