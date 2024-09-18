@@ -2,10 +2,12 @@
 import { z } from "zod";
 import { getItem } from "~/utility/localStorageControl";
 import { BASE_URL } from "~/constants";
-import type { IRegion } from "~/types";
+import type { IPost, IRegion } from "~/types";
 import type { FormSubmitEvent } from "#ui/types";
 
 const token = getItem("token");
+
+const data = ref<IPost[] | null>([]);
 
 const state = reactive({
     viloyat: "",
@@ -34,12 +36,29 @@ const formclear = () => {
 };
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
+    event.preventDefault();
     try {
-        console.log(event.data);
+        const { data: filter } = useFetch<IPost[]>(`${BASE_URL}filter/`, {
+            body: JSON.stringify(event.data),
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        data.value = filter.value;
     } catch (error) {
         console.error("Form submission error:", error);
     }
 }
+
+const { data: randomD } = useFetch<IPost[]>(`${BASE_URL}random_adver/`);
+const { data: randomD1 } = useFetch<IPost[]>(`${BASE_URL}adver/`, {
+    headers: {
+        Authorization: `Bearer ${token}`,
+    },
+});
+
+console.log(randomD1);
 
 const { data: discounts } = await useAsyncData("cart-discount", async () => {
     try {
@@ -125,7 +144,7 @@ watch(
                 </div>
                 <div class="col-span-3 dark:bg-gray-600 w-full py-3 px-4 overflow-y-auto scroll-container bg-slate-200">
                     <div class="grid grid-cols-3 gap-4">
-                        <CardsMainCard v-for="n in 10" :key="n" />
+                        <CardsMainCard v-for="item in randomD1" :key="item.created_at" :data="item" />
                     </div>
                 </div>
             </div>

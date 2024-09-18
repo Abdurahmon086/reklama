@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
 import type { FormSubmitEvent } from "#ui/types";
+import { BASE_URL } from "~/constants";
+import { getItem } from "~/utility/localStorageControl";
 
-const optionsVal = [
-    { label: "So'm", value: "som" },
-    { label: "Y.E", value: "yevro" },
-];
+const token = getItem("token");
+const imageUrls = ref<string[]>([]);
 
 const state = reactive({
     title: "",
@@ -13,15 +12,11 @@ const state = reactive({
     address: "",
     street: "",
     price: "",
-    select: undefined,
+    select: "",
     type: "",
     contact: "",
     images: [] as File[],
 });
-
-const form = ref<HTMLFormElement>();
-
-const imageUrls = ref<string[]>([]);
 
 const computedImageUrls = computed(() => {
     return state.images.map((image) => URL.createObjectURL(image));
@@ -44,13 +39,27 @@ function clearForm() {
     state.address = "";
     state.street = "";
     state.price = "";
-    state.select = undefined;
+    state.select = "";
     state.type = "";
     state.contact = "";
 }
 
 async function onSubmit(event: FormSubmitEvent<any>) {
     console.log(event.data);
+
+    try {
+        const { data, status } = await useFetch(`${BASE_URL}adver_post/`, {
+            method: "POST",
+            body: JSON.stringify(event.data),
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        console.log(data, status, 'sad');
+    } catch (err) {
+        console.error("Post send", err);
+    }
 }
 
 const numericPrice = computed({
@@ -62,7 +71,10 @@ const numericPrice = computed({
     },
 });
 
-
+const optionsVal = [
+    { label: "So'm", value: "som" },
+    { label: "Y.E", value: "yevro" },
+];
 
 onBeforeUnmount(() => {
     imageUrls.value.forEach((url) => URL.revokeObjectURL(url));
@@ -72,7 +84,7 @@ onBeforeUnmount(() => {
 <template>
     <div class="container">
         <div class="bg-slate-500 dark:bg-gray-800 my-36 py-10 px-5 h-full">
-            <UForm ref="form" :state="state" class="space-y-4" @submit="onSubmit">
+            <UForm :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormGroup name="title" label="Title" size="xl">
                     <UInput v-model="state.title" />
                 </UFormGroup>
