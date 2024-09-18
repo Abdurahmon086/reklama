@@ -12,16 +12,16 @@ export interface IRegion {
 }
 
 export interface IPost {
-    address: string;
-    contact: string;
+    title: string;
     content: string;
+    address: string;
+    street: number;
+    price: string;
+    type: number;
+    contact: string;
     created_at: string;
     image_url: string;
-    price: string;
     price_type: string;
     status: string;
-    street: number;
-    title: string;
-    type: number;
     user: number;
 }

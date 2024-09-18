@@ -15,17 +15,17 @@ const state = reactive({
     price_type: "",
     type: "",
     contact: "",
-    images: [] as File[],
+    image_url: [] as File[],
 });
 
 const computedImageUrls = computed(() => {
-    return state.images.map((image) => URL.createObjectURL(image));
+    return state.image_url.map((image) => URL.createObjectURL(image));
 });
 
 function handleFileChange(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files) {
-        state.images = Array.from(input.files);
+        state.image_url = Array.from(input.files);
         imageUrls.value = computedImageUrls.value;
     }
 }
@@ -33,7 +33,7 @@ function handleFileChange(event: Event) {
 function clearForm() {
     imageUrls.value.forEach((url) => URL.revokeObjectURL(url));
     imageUrls.value = [];
-    state.images = [];
+    state.image_url = [];
     state.title = "";
     state.content = "";
     state.address = "";
@@ -46,7 +46,7 @@ function clearForm() {
 
 async function onSubmit(event: FormSubmitEvent<any>) {
     console.log(event.data);
-
+    event.preventDefault();
     try {
         const { data, status } = await useFetch(`${BASE_URL}adver_post/`, {
             method: "POST",
@@ -56,7 +56,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
                 Authorization: `Bearer ${token}`,
             },
         });
-        console.log(data, status, "sad");
+        console.log(data, status);
     } catch (err) {
         console.error("Post send", err);
     }
@@ -115,7 +115,7 @@ onBeforeUnmount(() => {
                         <UInput v-model="state.contact" type="tel" />
                     </UFormGroup>
                 </div>
-                <UFormGroup name="images" label="Images" size="xl">
+                <UFormGroup name="image_url" label="Image" size="xl">
                     <input type="file" @change="handleFileChange" multiple accept="image/*" class="mt-2" />
                     <div class="mt-4">
                         <div v-for="(url, index) in imageUrls" :key="index" class="inline-block mr-4">

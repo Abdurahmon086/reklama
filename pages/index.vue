@@ -7,7 +7,7 @@ import type { FormSubmitEvent } from "#ui/types";
 
 const token = getItem("token");
 
-const data = ref<IPost[] | null>([]);
+const data = ref<IPost[]>([]);
 
 const state = reactive({
     address: "",
@@ -25,6 +25,7 @@ const formclear = () => {
     state.price = "";
     state.nextprice = "";
     state.price_type = "";
+    data.value = [];
 };
 
 async function onSubmit(event: FormSubmitEvent<any>) {
@@ -35,7 +36,6 @@ async function onSubmit(event: FormSubmitEvent<any>) {
         const filter = await $fetch<IPost[]>(`${BASE_URL}filter/?${queryParams}`).then((res) => res);
 
         data.value = filter;
-        console.log(filter);
     } catch (error) {
         console.error("Form submission error:", error);
     }
@@ -48,7 +48,6 @@ const { data: randomD1 } = useFetch<IPost[]>(`${BASE_URL}adver/`, {
     },
 });
 
-console.log(randomD1, data);
 
 const { data: discounts } = await useAsyncData("cart-discount", async () => {
     try {
@@ -135,7 +134,7 @@ watch(
                 <div class="col-span-3 dark:bg-gray-600 w-full py-3 px-4 overflow-y-auto scroll-container bg-slate-200">
                     <div class="grid grid-cols-3 gap-4">
                         <CardsMainCard
-                            v-for="item in data?.length > 0 ? data : randomD1"
+                            v-for="item in data.length > 0 ? data : randomD1"
                             :key="item.created_at"
                             :data="item"
                         />
