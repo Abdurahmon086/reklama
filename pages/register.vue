@@ -23,6 +23,27 @@ const schema = z.object({
 });
 
 type Schema = z.output<typeof schema>;
+interface LoginResponse {
+    access: string;
+}
+const login = async (email: string, password: string) => {
+    try {
+        loading.value = true;
+        const { data, status } = await useFetch<LoginResponse>(`${BASE_URL}get_token/`, {
+            method: "POST",
+            body: { username: email, password },
+        });
+
+        if (status.value == "success") {
+            localStorage.setItem("token", JSON.stringify(data?.value?.access));
+            router.push("/");
+        } else {
+            toast.add({ title: "Login failed. Please check your credentials." });
+        }
+    } finally {
+        loading.value = false;
+    }
+};
 
 const register = async (email: string, password: string) => {
     try {
@@ -35,7 +56,7 @@ const register = async (email: string, password: string) => {
             },
         });
         if (status.value == "success") {
-            router.push("/login");
+            await login(email, password);
         } else {
             toast.add({ title: "Login failed. Please check your credentials." });
         }
@@ -50,7 +71,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     if (email && password) {
         register(email, password);
-        router.push("/login");
     } else {
         toast.add({ title: "Please fill out both fields" });
     }
@@ -58,8 +78,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="dark:bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md">
+    <div class="min-h-screen flex items-center justify-center bg-blue-400 dark:bg-gray-900">
+        <div class="dark:bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md bg-white">
             <h2 class="text-2xl font-bold mb-6 text-center">Register</h2>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormGroup label="Email" name="email" size="lg">

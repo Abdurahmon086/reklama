@@ -1,5 +1,5 @@
 <template>
-    <div class="top-0 left-0 fixed w-full h-screen dark:bg-gray-500">
+    <div class="top-0 left-0 fixed w-full h-screen dark:bg-black">
         <div class="flex justify-center items-center h-full">
             <svg
                 class="animate-spin h-12 w-12 text-blue-500"

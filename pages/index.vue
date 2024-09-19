@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { z } from "zod";
 import { getItem } from "~/utility/localStorageControl";
 import { BASE_URL } from "~/constants";
 import type { IPost, IRegion } from "~/types";
@@ -30,7 +29,16 @@ const formclear = () => {
 
 async function onSubmit(event: FormSubmitEvent<any>) {
     event.preventDefault();
-    const queryParams = new URLSearchParams(event.data as any).toString();
+
+    const qeuryData = {
+        address: event.data.address.value ?? "",
+        nextprice: event.data.nextprice ?? "",
+        price: event.data.price ?? "",
+        price_type: event.data.price_type ?? "",
+        street: event.data.street.value ?? "",
+        type: event.data.type.value ?? "",
+    };
+    const queryParams = new URLSearchParams(qeuryData as any).toString();
 
     try {
         const filter = await $fetch<IPost[]>(`${BASE_URL}filter/?${queryParams}`).then((res) => res);
@@ -41,13 +49,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     }
 }
 
-const { data: randomD } = useFetch<IPost[]>(`${BASE_URL}random_adver/`);
-const { data: randomD1 } = useFetch<IPost[]>(`${BASE_URL}adver/`, {
-    headers: {
-        Authorization: `Bearer ${token}`,
-    },
-});
-
+const { data: randomD1 } = useFetch<IPost[]>(`${BASE_URL}random_adver/`);
 
 const { data: discounts } = await useAsyncData("cart-discount", async () => {
     try {

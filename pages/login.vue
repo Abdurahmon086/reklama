@@ -11,7 +11,6 @@ import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 import { BASE_URL } from "~/constants";
 
-
 const router = useRouter();
 const toast = useToast();
 
@@ -28,8 +27,6 @@ const schema = z.object({
 });
 
 type Schema = z.output<typeof schema>;
-
-
 
 const login = async (email: string, password: string) => {
     try {
@@ -63,8 +60,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="dark:bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md">
+    <div class="min-h-screen flex items-center justify-center bg-blue-400 dark:bg-gray-900">
+        <div class="dark:bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md bg-white">
             <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormGroup label="Email" name="email" size="lg">
