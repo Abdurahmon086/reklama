@@ -45,7 +45,6 @@ function clearForm() {
 }
 
 async function onSubmit(event: FormSubmitEvent<any>) {
-    console.log(event.data);
     event.preventDefault();
     try {
         const { data, status } = await useFetch(`${BASE_URL}adver_post/`, {

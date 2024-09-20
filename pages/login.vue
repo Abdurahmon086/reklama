@@ -3,13 +3,10 @@ definePageMeta({
     layout: "login",
 });
 
-interface LoginResponse {
-    access: string;
-}
-
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 import { BASE_URL } from "~/constants";
+import type { LoginResponse } from "~/types";
 
 const router = useRouter();
 const toast = useToast();

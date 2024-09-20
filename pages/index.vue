@@ -54,16 +54,8 @@ const { data: randomD1 } = useFetch<IPost[]>(`${BASE_URL}random_adver/`);
 const { data: discounts } = await useAsyncData("cart-discount", async () => {
     try {
         const [region, type] = await Promise.all([
-            $fetch<IRegion[]>(`${BASE_URL}get_region/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }),
-            $fetch<IRegion[]>(`${BASE_URL}adver_type/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }),
+            $fetch<IRegion[]>(`${BASE_URL}get_region/`),
+            $fetch<IRegion[]>(`${BASE_URL}adver_type/`),
         ]);
         const re = region.map(({ id, name }) => ({ label: name, value: id })) ?? [];
         const ty = type.map(({ id, name }) => ({ label: name, value: id })) ?? [];

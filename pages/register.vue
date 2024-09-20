@@ -6,6 +6,7 @@ definePageMeta({
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 import { BASE_URL } from "~/constants";
+import type { LoginResponse } from "~/types";
 
 const router = useRouter();
 const toast = useToast();
@@ -23,9 +24,7 @@ const schema = z.object({
 });
 
 type Schema = z.output<typeof schema>;
-interface LoginResponse {
-    access: string;
-}
+
 const login = async (email: string, password: string) => {
     try {
         loading.value = true;
