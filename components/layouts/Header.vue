@@ -47,7 +47,7 @@ const items = computed(() => [
                 removeItem("token");
                 token.value = "";
                 data.value = null;
-                router.push("/login");
+                router.push("/");
             },
         },
     ],
