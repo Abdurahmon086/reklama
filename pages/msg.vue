@@ -5,7 +5,12 @@ import type { FormSubmitEvent } from "#ui/types";
 import type { IMessage } from "~/types";
 import { BASE_URL } from "~/constants";
 
+const router = useRouter();
 const token = getItem("token");
+
+if (!token) {
+    router.push("/login");
+}
 
 const isOpen = ref(false);
 const getId = ref<number | null>(null);
@@ -28,13 +33,12 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const { data, refresh } = await useFetch<IMessage[]>(`${BASE_URL}message/`, {
+const { data, refresh, status } = await useFetch<IMessage[]>(`${BASE_URL}message/`, {
     headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
     },
 });
-
 const fetchMessages = async () => {
     try {
         await refresh();
@@ -135,7 +139,7 @@ const updateMessage = async (event: FormSubmitEvent<Schema>) => {
                 <UFormGroup name="message" class="flex-1">
                     <UInput v-model="state.message" class="!w-full" size="xl" placeholder="Xabar yuborish...." />
                 </UFormGroup>
-                <UButton type="submit">Submit</UButton>
+                <UButton type="submit" color="black">Submit</UButton>
             </UForm>
         </div>
     </div>

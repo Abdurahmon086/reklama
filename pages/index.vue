@@ -97,7 +97,7 @@ watch(
 </script>
 
 <template>
-    <div class="w-full h-screen bg-blue-400 dark:bg-gray-900 pt-24">
+    <div class="w-full h-screen pt-24">
         <main class="container">
             <div class="grid grid-cols-4 rounded h-[800px]">
                 <div class="col-span-1 bg-slate-500 dark:bg-gray-800 py-3 px-4 h-full">

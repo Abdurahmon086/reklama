@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "#ui/types";
 import { BASE_URL } from "~/constants";
+import type { IRegion } from "~/types";
 import { getItem } from "~/utility/localStorageControl";
 
+const router = useRouter();
 const token = getItem("token");
 const imageUrls = ref<string[]>([]);
+
+if (!token) {
+    router.push("/login");
+}
 
 const state = reactive({
     title: "",
@@ -46,10 +52,22 @@ function clearForm() {
 
 async function onSubmit(event: FormSubmitEvent<any>) {
     event.preventDefault();
+    const bodyData = {
+        address: event.data.address.value ?? "",
+        contact: event.data.contact ?? "",
+        content: event.data.content ?? "",
+        image_url: event.data.image_url ?? [],
+        price: event.data.price ?? "",
+        price_type: event.data.price_type ?? "",
+        street: event.data.street.value ?? "",
+        title: event.data.title ?? "",
+        type: event.data.type.value ?? "",
+    };
+
     try {
         const { data, status } = await useFetch(`${BASE_URL}adver_post/`, {
             method: "POST",
-            body: JSON.stringify(event.data),
+            body: JSON.stringify(bodyData),
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
@@ -70,10 +88,49 @@ const numericPrice = computed({
     },
 });
 
+const { data: discounts } = await useAsyncData("cart-discount", async () => {
+    try {
+        const [region, type] = await Promise.all([
+            $fetch<IRegion[]>(`${BASE_URL}get_region/`),
+            $fetch<IRegion[]>(`${BASE_URL}adver_type/`),
+        ]);
+        const re = region.map(({ id, name }) => ({ label: name, value: id })) ?? [];
+        const ty = type.map(({ id, name }) => ({ label: name, value: id })) ?? [];
+
+        return { re, ty };
+    } catch (err) {
+        console.error("Error fetching data:", err);
+        return { region: [], type: [] };
+    }
+});
+
 const optionsVal = [
-    { label: "So'm", value: "som" },
+    { label: "So'm", value: "Sum" },
     { label: "Y.E", value: "yevro" },
 ];
+
+const cityOptions = ref<{ label: string; value: number }[]>([]);
+
+watch(
+    () => state.address,
+    async (newVal: any) => {
+        if (newVal) {
+            try {
+                const cities = await $fetch<IRegion[]>(`${BASE_URL}get_street/${newVal.value}/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                cityOptions.value = cities.map(({ name, id }) => ({
+                    label: name,
+                    value: id,
+                }));
+            } catch (error) {
+                console.error("Error fetching cities:", error);
+            }
+        }
+    }
+);
 
 onBeforeUnmount(() => {
     imageUrls.value.forEach((url) => URL.revokeObjectURL(url));
@@ -81,52 +138,54 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="container">
-        <div class="bg-slate-500 dark:bg-gray-800 my-36 py-10 px-5 h-full">
-            <UForm :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormGroup name="title" label="Title" size="xl">
-                    <UInput v-model="state.title" />
-                </UFormGroup>
-                <UFormGroup name="content" label="Content" size="xl">
-                    <UTextarea v-model="state.content" />
-                </UFormGroup>
-                <div class="flex justify-between gap-6">
-                    <UFormGroup name="address" label="Address" size="xl" class="w-full">
-                        <UInput v-model="state.address" />
+    <div class="py-28 min-h-screen">
+        <div class="container">
+            <div class="bg-slate-500 dark:bg-gray-800 py-10 px-5 h-full">
+                <UForm :state="state" class="space-y-4" @submit="onSubmit">
+                    <UFormGroup name="title" label="Title" size="xl">
+                        <UInput v-model="state.title" />
                     </UFormGroup>
-                    <UFormGroup name="street" label="Street" size="xl" class="w-full">
-                        <UInput v-model="state.street" />
+                    <UFormGroup name="content" label="Content" size="xl">
+                        <UTextarea v-model="state.content" />
                     </UFormGroup>
-                </div>
-                <div class="flex justify-between gap-6">
-                    <UFormGroup name="price" label="Price" size="xl" class="w-full">
-                        <UInput v-model="numericPrice" type="text" />
-                    </UFormGroup>
-                    <UFormGroup name="price_type" label="Valyuta" size="xl" class="w-full">
-                        <USelect v-model="state.price_type" :options="optionsVal" />
-                    </UFormGroup>
-                </div>
-                <div class="flex justify-between gap-6">
-                    <UFormGroup name="type" label="Type" size="xl" class="w-full">
-                        <UInput v-model="state.type" />
-                    </UFormGroup>
-                    <UFormGroup name="contact" label="Contact" size="xl" class="w-full">
-                        <UInput v-model="state.contact" type="tel" />
-                    </UFormGroup>
-                </div>
-                <UFormGroup name="image_url" label="Image" size="xl">
-                    <input type="file" @change="handleFileChange" multiple accept="image/*" class="mt-2" />
-                    <div class="mt-4">
-                        <div v-for="(url, index) in imageUrls" :key="index" class="inline-block mr-4">
-                            <img :src="url" alt="Image preview" class="max-w-[350px] aspect-[1.7] object-cover" />
-                        </div>
+                    <div class="flex justify-between gap-6">
+                        <UFormGroup name="address" label="Viloyat:" size="xl" class="w-full">
+                            <UInputMenu v-model="state.address" :options="discounts?.re" />
+                        </UFormGroup>
+                        <UFormGroup name="street" label="Shahar:" size="xl" class="w-full">
+                            <UInputMenu v-model="state.street" :options="cityOptions" />
+                        </UFormGroup>
                     </div>
-                </UFormGroup>
+                    <div class="flex justify-between gap-6">
+                        <UFormGroup name="type" label="Tur:" size="xl" class="w-full">
+                            <UInputMenu v-model="state.type" :options="discounts?.ty" />
+                        </UFormGroup>
+                        <UFormGroup name="contact" label="Contact" size="xl" class="w-full">
+                            <UInput v-model="state.contact" type="tel" />
+                        </UFormGroup>
+                    </div>
+                    <div class="flex justify-between gap-6">
+                        <UFormGroup name="price" label="Price" size="xl" class="w-full">
+                            <UInput v-model="numericPrice" type="text" />
+                        </UFormGroup>
+                        <UFormGroup name="price_type" label="Valyuta" size="xl" class="w-full">
+                            <USelect v-model="state.price_type" :options="optionsVal" />
+                        </UFormGroup>
+                    </div>
+                    <UFormGroup name="image_url" label="Image" size="xl">
+                        <input type="file" @change="handleFileChange" multiple accept="image/*" class="mt-2" />
+                        <div class="mt-4">
+                            <div v-for="(url, index) in imageUrls" :key="index" class="inline-block mr-4">
+                                <img :src="url" alt="Image preview" class="max-w-[350px] aspect-[1.7] object-cover" />
+                            </div>
+                        </div>
+                    </UFormGroup>
 
-                <UButton type="submit"> Submit </UButton>
+                    <UButton type="submit"> Submit </UButton>
 
-                <UButton variant="outline" class="ml-2" @click="clearForm"> Clear </UButton>
-            </UForm>
+                    <UButton variant="outline" class="ml-2" @click="clearForm"> Clear </UButton>
+                </UForm>
+            </div>
         </div>
     </div>
 </template>
