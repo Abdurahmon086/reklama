@@ -43,6 +43,10 @@ const fetchMessages = async () => {
     }
 };
 
+if (!data.value) {
+    fetchMessages();
+}
+
 const createPost = async (event: FormSubmitEvent<Schema>) => {
     event.preventDefault();
     try {

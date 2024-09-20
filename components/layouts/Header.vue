@@ -37,30 +37,11 @@ const items = computed(() => [
     ],
     [
         {
-            label: "Edit",
-            icon: "i-heroicons-pencil-square-20-solid",
-            shortcuts: ["E"],
-            click: () => {
-                console.log("Edit");
-            },
-        },
-        {
-            label: "Duplicate",
-            icon: "i-heroicons-document-duplicate-20-solid",
-            shortcuts: ["D"],
-            disabled: true,
+            label: data.value?.phone_number.toString() || "",
+            icon: "i-ion-ios-telephone",
         },
     ],
-    [
-        {
-            label: "Archive",
-            icon: "i-heroicons-archive-box-20-solid",
-        },
-        {
-            label: "Move",
-            icon: "i-heroicons-arrow-right-circle-20-solid",
-        },
-    ],
+
     [
         {
             label: "Logout",
@@ -82,15 +63,19 @@ const items = computed(() => [
             <div class="flex justify-between items-center">
                 <NuxtLink to="/" class="text-white text-3xl font-bold"> Logo </NuxtLink>
                 <div class="text-white flex gap-4 items-center pr-1">
-                    <NuxtLink to="/login">Login</NuxtLink>
-                    <NuxtLink to="/register">Register</NuxtLink>
                     <USelect v-model="country" :options="countries" />
                     <ColorScheme>
                         <USelect v-model="$colorMode.preference" :options="['system', 'light', 'dark']" />
                     </ColorScheme>
-                    <UDropdown :items="items" :popper="{ arrow: true }">
-                        <UAvatar :alt="data?.username" size="sm" />
-                    </UDropdown>
+                    <template v-if="!data">
+                        <NuxtLink to="/login">Login</NuxtLink>
+                        <NuxtLink to="/register">Register</NuxtLink>
+                    </template>
+                    <template v-else>
+                        <UDropdown :items="items" :popper="{ arrow: true }">
+                            <UAvatar :alt="data?.username" size="sm" />
+                        </UDropdown>
+                    </template>
                 </div>
             </div>
         </div>
