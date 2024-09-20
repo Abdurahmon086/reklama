@@ -53,27 +53,25 @@ function clearForm() {
 async function onSubmit(event: FormSubmitEvent<any>) {
     event.preventDefault();
     const bodyData = {
+        image_url: event.data.image_url ?? [],
+        title: event.data.title ?? "",
+        content: event.data.content ?? "",
         address: event.data.address.value ?? "",
         contact: event.data.contact ?? "",
-        content: event.data.content ?? "",
-        image_url: event.data.image_url ?? [],
         price: event.data.price ?? "",
-        price_type: event.data.price_type ?? "",
         street: event.data.street.value ?? "",
-        title: event.data.title ?? "",
         type: event.data.type.value ?? "",
     };
+    console.log(bodyData);
 
     try {
-        const { data, status } = await useFetch(`${BASE_URL}adver_post/`, {
+        await $fetch(`${BASE_URL}adver_post/`, {
             method: "POST",
             body: JSON.stringify(bodyData),
             headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-        });
-        console.log(data, status);
+        }).then((res) => console.log(res));
     } catch (err) {
         console.error("Post send", err);
     }
