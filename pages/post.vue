@@ -69,11 +69,12 @@ async function onSubmit(event: FormSubmitEvent<any>) {
             method: "POST",
             body: JSON.stringify(bodyData),
             headers: {
+                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
         }).then((res) => console.log(res));
     } catch (err) {
-        console.error("Post send", err);
+        console.log("Post send", err);
     }
 }
 
