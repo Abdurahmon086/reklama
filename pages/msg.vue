@@ -7,6 +7,7 @@ import { BASE_URL } from "~/constants";
 
 const router = useRouter();
 const token = getItem("token");
+const toast = useToast();
 
 if (!token) {
     router.push("/login");
@@ -64,10 +65,12 @@ const createPost = async (event: FormSubmitEvent<Schema>) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
+            toast.add({ title: "Successfuly created!" });
             state.message = "";
             await fetchMessages();
         }
     } catch (error) {
+        toast.add({ title: "Sorry, Somthink wrong!" });
         console.error("Error creating post:", error);
     }
 };
@@ -82,7 +85,9 @@ const deleteMessage = async (id: number) => {
             },
         });
         await fetchMessages();
+        toast.add({ title: "Successfuly deleted!" });
     } catch (error) {
+        toast.add({ title: "Sorry, Somethink error!" });
         console.error("Error deleting message:", error);
     }
 };
@@ -102,7 +107,9 @@ const updateMessage = async (event: FormSubmitEvent<Schema>) => {
         });
         await fetchMessages();
         isOpen.value = false;
+        toast.add({ title: "Successfuly updated!" });
     } catch (error) {
+        toast.add({ title: "Sorry, Somethink error!" });
         console.error("Error updating message:", error);
     }
 };
