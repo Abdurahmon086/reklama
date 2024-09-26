@@ -57,8 +57,11 @@ const register = async (email: string, password: string) => {
         if (status.value == "success") {
             await login(email, password);
         } else {
-            toast.add({ title: "Login failed. Please check your credentials." });
+            toast.add({ title: "Rigister failed. Please check your credentials." });
         }
+    } catch (err) {
+        toast.add({ title: "Sorry, something went wrong." });
+        console.log(err);
     } finally {
         loading.value = false;
     }
@@ -77,7 +80,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-    <div class="min-h-screen flex items-center justify-center ">
+    <div class="min-h-screen flex items-center justify-center">
         <div class="dark:bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md bg-white">
             <h2 class="text-2xl font-bold mb-6 text-center">Register</h2>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">

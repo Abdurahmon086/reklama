@@ -39,7 +39,11 @@ const login = async (email: string, password: string) => {
         } else {
             toast.add({ title: "Login failed. Please check your credentials." });
         }
-    } finally {
+    } catch (err) {
+        toast.add({ title: "Sorry, something went wrong." });
+        console.log(err);
+        
+    }  finally {
         loading.value = false;
     }
 };

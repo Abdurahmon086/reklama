@@ -4,9 +4,11 @@ import { BASE_URL } from "~/constants";
 import type { IRegion } from "~/types";
 import { getItem } from "~/utility/localStorageControl";
 
+const toast = useToast();
 const router = useRouter();
 const token = getItem("token");
 const imageUrls = ref<string[]>([]);
+const loading = ref<boolean>(false);
 
 if (!token) {
     router.push("/login");
@@ -62,8 +64,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
         street: event.data.street.value ?? "",
         type: event.data.type.value ?? "",
     };
-    console.log(bodyData);
-
+    loading.value = true;
     try {
         await $fetch(`${BASE_URL}adver_post/`, {
             method: "POST",
@@ -72,8 +73,14 @@ async function onSubmit(event: FormSubmitEvent<any>) {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-        }).then((res) => console.log(res));
+        })
+            .then((res) => {
+                clearForm();
+                toast.add({ title: "Success added!" });
+            })
+            .finally(() => (loading.value = false));
     } catch (err) {
+        toast.add({ title: "Somethink error not send your post" });
         console.log("Post send", err);
     }
 }
@@ -142,37 +149,44 @@ onBeforeUnmount(() => {
             <div class="bg-slate-500 dark:bg-gray-800 py-10 px-5 h-full">
                 <UForm :state="state" class="space-y-4" @submit="onSubmit">
                     <UFormGroup name="title" label="Title" size="xl">
-                        <UInput v-model="state.title" />
+                        <UInput v-model="state.title" :disabled="loading" />
                     </UFormGroup>
                     <UFormGroup name="content" label="Content" size="xl">
-                        <UTextarea v-model="state.content" />
+                        <UTextarea v-model="state.content" :disabled="loading" />
                     </UFormGroup>
                     <div class="flex justify-between gap-6">
                         <UFormGroup name="address" label="Viloyat:" size="xl" class="w-full">
-                            <UInputMenu v-model="state.address" :options="discounts?.re" />
+                            <UInputMenu v-model="state.address" :options="discounts?.re" :disabled="loading" />
                         </UFormGroup>
                         <UFormGroup name="street" label="Shahar:" size="xl" class="w-full">
-                            <UInputMenu v-model="state.street" :options="cityOptions" />
+                            <UInputMenu v-model="state.street" :options="cityOptions" :disabled="loading" />
                         </UFormGroup>
                     </div>
                     <div class="flex justify-between gap-6">
                         <UFormGroup name="type" label="Tur:" size="xl" class="w-full">
-                            <UInputMenu v-model="state.type" :options="discounts?.ty" />
+                            <UInputMenu v-model="state.type" :options="discounts?.ty" :disabled="loading" />
                         </UFormGroup>
                         <UFormGroup name="contact" label="Contact" size="xl" class="w-full">
-                            <UInput v-model="state.contact" type="tel" />
+                            <UInput v-model="state.contact" type="tel" :disabled="loading" />
                         </UFormGroup>
                     </div>
                     <div class="flex justify-between gap-6">
                         <UFormGroup name="price" label="Price" size="xl" class="w-full">
-                            <UInput v-model="numericPrice" type="text" />
+                            <UInput v-model="numericPrice" type="text" :disabled="loading" />
                         </UFormGroup>
                         <UFormGroup name="price_type" label="Valyuta" size="xl" class="w-full">
-                            <USelect v-model="state.price_type" :options="optionsVal" />
+                            <USelect v-model="state.price_type" :options="optionsVal" :disabled="loading" />
                         </UFormGroup>
                     </div>
                     <UFormGroup name="image_url" label="Image" size="xl">
-                        <input type="file" @change="handleFileChange" multiple accept="image/*" class="mt-2" />
+                        <input
+                            type="file"
+                            @change="handleFileChange"
+                            multiple
+                            accept="image/*"
+                            class="mt-2"
+                            :disabled="loading"
+                        />
                         <div class="mt-4">
                             <div v-for="(url, index) in imageUrls" :key="index" class="inline-block mr-4">
                                 <img :src="url" alt="Image preview" class="max-w-[350px] aspect-[1.7] object-cover" />
@@ -180,9 +194,9 @@ onBeforeUnmount(() => {
                         </div>
                     </UFormGroup>
 
-                    <UButton type="submit"> Submit </UButton>
+                    <UButton type="submit" :disabled="loading"> Submit </UButton>
 
-                    <UButton variant="outline" class="ml-2" @click="clearForm"> Clear </UButton>
+                    <UButton variant="outline" class="ml-2" @click="clearForm" :disabled="loading"> Clear </UButton>
                 </UForm>
             </div>
         </div>
