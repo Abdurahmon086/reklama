@@ -50,6 +50,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 }
 
 const { data: randomD1 } = useFetch<IPost[]>(`${BASE_URL}random_adver/`);
+console.log(randomD1);
 
 const { data: discounts } = await useAsyncData("cart-discount", async () => {
     try {
@@ -69,7 +70,7 @@ const { data: discounts } = await useAsyncData("cart-discount", async () => {
 
 const optionsVal = [
     { label: "So'm", value: "Sum" },
-    { label: "Y.E", value: "yevro" },
+    { label: "Y.E", value: "Dollar" },
 ];
 
 const cityOptions = ref<{ label: string; value: number }[]>([]);
