@@ -50,7 +50,6 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 }
 
 const { data: randomD1 } = useFetch<IPost[]>(`${BASE_URL}random_adver/`);
-console.log(randomD1);
 
 const { data: discounts } = await useAsyncData("cart-discount", async () => {
     try {
